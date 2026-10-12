@@ -6,7 +6,7 @@ namespace Game {
         public int PongWins { get; set; }
         public int PongBestRally { get; set; }
         public int BreakoutBestScore { get; set; }
-        public string ServerAddress { get; set; } = "";
+        public string ServerAddress { get; set; } = "bot.suancaixianyu.cn:28886";
 
         public static readonly string[] TrophyNames = ["首个得分", "战胜 AI", "完美对局", "首次击破", "高分挑战", "清空球场"];
         public static readonly string[] TrophyDescriptions = ["乒乓对战中获得 1 分", "率先得到 5 分，赢下比赛", "以 5 : 0 战胜 AI", "击破任意一块砖块", "单局打砖块获得 500 分", "击破全部 40 块砖块"];
