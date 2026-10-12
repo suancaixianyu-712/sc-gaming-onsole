@@ -131,7 +131,18 @@ namespace Game {
                 return;
             }
             p.RoundedRect(inset, inset, size, size, 13f,
-                GameIndex == 0 ? new Color(19, 72, 109) : new Color(66, 28, 95));
+                GameIndex == 0 ? new Color(19, 72, 109) : GameIndex == 1 ? new Color(66, 28, 95) : new Color(28, 60, 44));
+            if (GameIndex == 2) {
+                // T 形 + L 形，纯色示意。
+                Color t = new(176, 120, 230), l = new(250, 170, 80), dirt = new(134, 96, 67);
+                for (int i = 0; i < 3; i++) p.Rect(20f + i * 18f, 22f, 16f, 16f, t);
+                p.Rect(38f, 40f, 16f, 16f, t);
+                for (int i = 0; i < 3; i++) p.Rect(62f, 40f + i * 0f, 16f, 16f, l);
+                p.Rect(62f, 58f, 16f, 16f, l);
+                p.Rect(44f, 58f, 16f, 16f, l);
+                p.Rect(14f, 78f, 72f, 8f, dirt);
+                return;
+            }
             if (GameIndex == 0) {
                 p.RoundedRect(19f, 21f, 48f, 7f, 3f, new Color(252, 182, 97));
                 p.RoundedRect(32f, 74f, 48f, 7f, 3f, new Color(114, 232, 248));

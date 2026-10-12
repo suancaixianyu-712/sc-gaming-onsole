@@ -178,6 +178,10 @@ namespace Game {
                 UpdateKeyboard(Key.Home, PSPConsoleControl.Home);
                 UpdateKeyboard(Key.Z, PSPConsoleControl.Cross);
                 UpdateKeyboard(Key.X, PSPConsoleControl.Circle);
+                UpdateKeyboard(Key.W, PSPConsoleControl.Up);
+                UpdateKeyboard(Key.S, PSPConsoleControl.Down);
+                UpdateKeyboard(Key.C, PSPConsoleControl.Square);
+                UpdateKeyboard(Key.V, PSPConsoleControl.Triangle);
                 UpdateKeyboard(Key.Q, PSPConsoleControl.LeftShoulder);
                 UpdateKeyboard(Key.E, PSPConsoleControl.RightShoulder);
             }
@@ -197,6 +201,7 @@ namespace Game {
             m_state.UpdateAnimation(Time.FrameDuration, m_held);
             m_hint.Text = m_state.Page switch {
                 PSPConsolePage.Game when m_state.Game.IsOnline => "摇杆 / 方向键左右移动 · O 离开 · 联机比赛持续进行",
+                PSPConsolePage.Game when m_state.Game is PSPTetrisGame => "左右移动 · 上/X 旋转 · 下 软降 · □/△ 硬降 · START 暂停 · O 返回",
                 PSPConsolePage.Game => "摇杆 / 方向键左右移动 · X 发球 · O 返回 · START 暂停",
                 PSPConsolePage.Home => "方向键选择 · X 进入合集 · O 关闭",
                 PSPConsolePage.Collection => "L / R 或方向键切换游戏 · X 开始 · O 返回主页",

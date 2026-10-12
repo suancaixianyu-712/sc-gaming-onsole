@@ -7,12 +7,12 @@ namespace Game {
     public enum PSPHomeFocus { Play, Trophies }
 
     public sealed partial class PSPConsoleState : IDisposable {
-        public const int GameCount = 2;
-        public static readonly string[] GameNames = ["乒乓对决", "乒乓打砖块"];
-        public static readonly string[] GameDescriptions = ["单人 AI 或双人联机，率先取得 5 分。", "左右移动挡板，击破所有砖块。"];
+        public const int GameCount = 3;
+        public static readonly string[] GameNames = ["乒乓对决", "乒乓打砖块", "俄罗斯方块"];
+        public static readonly string[] GameDescriptions = ["单人 AI 或双人联机，率先取得 5 分。", "左右移动挡板，击破所有砖块。", "原版方块堆叠消行，等级越高下落越快。"];
         public const string CollectionName = "小游戏合集";
         public const string CollectionTag = "合集  /  现有小游戏";
-        public const string CollectionDescription = "乒乓对决、乒乓打砖块。进入合集后选择要玩的游戏。";
+        public const string CollectionDescription = "乒乓对决、乒乓打砖块、俄罗斯方块。进入合集后选择要玩的游戏。";
         readonly float[] m_releaseDelays = new float[(int)PSPConsoleControl.Count];
         Vector2 m_analogTarget;
 
@@ -127,7 +127,7 @@ namespace Game {
                 ResetAnalog();
                 return;
             }
-            Game = new PSPPaddleGame(SelectedGame, Progress, UnlockTrophy);
+            Game = SelectedGame == 2 ? new PSPTetrisGame(Progress, UnlockTrophy) : new PSPPaddleGame(SelectedGame, Progress, UnlockTrophy);
             Page = PSPConsolePage.Game;
             ResetAnalog();
         }
@@ -178,7 +178,7 @@ namespace Game {
             catch (Exception exception) { Log.Error($"游戏机网络消息处理失败：{exception.Message}"); }
             UpdateLobbyRefresh();
             float dt = Math.Clamp(deltaTime, 0f, 0.1f);
-            float blendTarget = Page == PSPConsolePage.Home ? 0.35f : SelectedGame == 0 ? 0f : 1f;
+            float blendTarget = Page == PSPConsolePage.Home ? 0.35f : SelectedGame == 0 ? 0f : SelectedGame == 1 ? 1f : 0.6f;
             BackgroundBlend += (blendTarget - BackgroundBlend) * (1f - MathF.Exp(-9f * dt));
             NotificationTime = MathF.Max(0f, NotificationTime - dt);
             AnalogOffset += (m_analogTarget - AnalogOffset) * (1f - MathF.Exp(-(IsAnalogHeld ? 45f : 24f) * dt));
@@ -196,6 +196,7 @@ namespace Game {
             if (Page == PSPConsolePage.Game && (Window.IsActive || Game.IsOnline)) {
                 float digital = (held[(int)PSPConsoleControl.Right] ? 1f : 0f) - (held[(int)PSPConsoleControl.Left] ? 1f : 0f);
                 bool usingDpad = held[(int)PSPConsoleControl.Right] || held[(int)PSPConsoleControl.Left];
+                if (Game is PSPTetrisGame tetris) tetris.SoftDrop = Window.IsActive && (held[(int)PSPConsoleControl.Down] || AnalogInput.Y > 0.6f);
                 Game.Update(dt, Window.IsActive ? usingDpad ? digital : AnalogInput.X : 0f);
             }
         }

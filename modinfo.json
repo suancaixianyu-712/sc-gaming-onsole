@@ -1,9 +1,9 @@
 {
   "$schema": "https://gitee.com/SC-SPM/SurvivalcraftApi/raw/SCAPI1.9/Survivalcraft/Content/modinfo-scheme.json",
   "Name": "游戏机",
-  "Version": "1.4.4",
+  "Version": "1.4.5",
   "ApiVersion": "1.9.3",
-  "Description": "PSP 手持游戏机，含小游戏合集入口、AI 乒乓、打砖块、联机大厅乒乓及奖杯。",
+  "Description": "PSP 手持游戏机，含小游戏合集入口、AI 乒乓、打砖块、俄罗斯方块（原版方块贴图）、联机大厅乒乓及奖杯。",
   "ScVersion": "2.4.0.0",
   "NonPersistentMod": false,
   "GameplayImpactLevel": "Cosmetic",

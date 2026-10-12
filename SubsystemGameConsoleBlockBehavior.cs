@@ -16,10 +16,11 @@ namespace Game {
                 if (!int.TryParse(entry.Key, NumberStyles.Integer, CultureInfo.InvariantCulture, out int playerIndex)
                     || entry.Value is not ValuesDictionary saved) continue;
                 m_profiles[playerIndex] = new PSPConsoleProgress {
-                    TrophyMask = saved.GetValue("TrophyMask", 0) & 63,
+                    TrophyMask = saved.GetValue("TrophyMask", 0) & 511,
                     PongWins = Math.Max(0, saved.GetValue("PongWins", 0)),
                     PongBestRally = Math.Max(0, saved.GetValue("PongBestRally", 0)),
                     BreakoutBestScore = Math.Max(0, saved.GetValue("BreakoutBestScore", 0)),
+                    TetrisBestScore = Math.Max(0, saved.GetValue("TetrisBestScore", 0)),
                     ServerAddress = PSPConsoleProgress.MigrateServerAddress(saved.GetValue("ServerAddress", ""))
                 };
             }
@@ -32,7 +33,7 @@ namespace Game {
                 PSPConsoleProgress progress = entry.Value;
                 profiles.SetValue(entry.Key.ToString(CultureInfo.InvariantCulture), new ValuesDictionary {
                     { "TrophyMask", progress.TrophyMask }, { "PongWins", progress.PongWins },
-                    { "PongBestRally", progress.PongBestRally }, { "BreakoutBestScore", progress.BreakoutBestScore },
+                    { "PongBestRally", progress.PongBestRally }, { "BreakoutBestScore", progress.BreakoutBestScore }, { "TetrisBestScore", progress.TetrisBestScore },
                     { "ServerAddress", progress.ServerAddress }
                 });
             }

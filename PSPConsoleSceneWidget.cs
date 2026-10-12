@@ -91,8 +91,24 @@ namespace Game {
             }
         }
 
+        void DrawTetris(PSPConsolePainter p, PSPTetrisGame game) {
+            // 只画 2D 底板；方块本体由 PSPTetrisBoardWidget 在后一绘制层用 DrawBlock 画。
+            p.Gradient(0f, 0f, 960f, 540f, new Color(10, 18, 34), new Color(17, 29, 47), new Color(7, 15, 27), new Color(9, 18, 34));
+            const float c = PSPTetrisBoardWidget.Cell;
+            p.Rect(PSPTetrisBoardWidget.FieldX, PSPTetrisBoardWidget.FieldY, c * PSPTetrisGame.Columns, c * PSPTetrisGame.Rows, new Color(14, 20, 34));
+            for (int x = 1; x < PSPTetrisGame.Columns; x++)
+                p.Rect(PSPTetrisBoardWidget.FieldX + x * c, PSPTetrisBoardWidget.FieldY, 1f, c * PSPTetrisGame.Rows, new Color(30, 40, 60));
+            p.Rect(PSPTetrisBoardWidget.PreviewX - 12f, PSPTetrisBoardWidget.PreviewY - 32f, c * 4f + 24f, c * 4f + 44f, new Color(18, 29, 44, 220));
+            p.Rect(PSPTetrisBoardWidget.PreviewX - 12f, PSPTetrisBoardWidget.PreviewY - 32f, c * 4f + 24f, 3f, new Color(141, 220, 247));
+            if (game.IsPaused || game.Phase == PSPGamePhase.Finished) {
+                p.Rect(238f, 225f, 484f, 130f, new Color(8, 15, 28, 240));
+                p.Rect(238f, 225f, 3f, 130f, new Color(141, 220, 247));
+            }
+        }
+
         void DrawGame(PSPConsolePainter p) {
             PSPPaddleGame game = m_state.Game;
+            if (game is PSPTetrisGame tetris) { DrawTetris(p, tetris); return; }
             bool pong = game.GameIndex == 0;
             p.Gradient(0f, 0f, 960f, 540f, new Color(10, 18, 34), new Color(17, 29, 47), new Color(7, 15, 27), new Color(9, 18, 34));
             p.Rect(28f, 63f, 904f, 2f, new Color(67, 91, 122));

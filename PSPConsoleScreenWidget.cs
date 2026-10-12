@@ -7,6 +7,7 @@ namespace Game {
     public sealed class PSPConsoleScreenWidget : CanvasWidget {
         readonly PSPConsoleState m_state;
         readonly PSPConsoleSceneWidget m_scene;
+        readonly PSPTetrisBoardWidget m_board;
         readonly PSPPongMenuWidget m_pongMenu;
         public bool IsTextInputActive => m_pongMenu.IsTextInputActive;
         public void EndTextInput() => m_pongMenu.EndTextInput();
@@ -27,6 +28,8 @@ namespace Game {
             IsHitTestVisible = false;
             m_scene = new PSPConsoleSceneWidget(state);
             Children.Add(m_scene);
+            m_board = new PSPTetrisBoardWidget(state);
+            Children.Add(m_board);
             m_header = AddLabel("游戏", m_homeWidgets);
             m_clock = AddLabel("", m_homeWidgets, TextAnchor.Right | TextAnchor.VerticalCenter);
             m_tag = AddLabel("", m_homeWidgets);
@@ -34,7 +37,7 @@ namespace Game {
             m_description = AddLabel("", m_homeWidgets);
             m_record = AddLabel("", m_homeWidgets);
             m_play = new PSPConsoleActionWidget("进入合集") { Primary = true };
-            m_trophies = new PSPConsoleActionWidget("奖杯 0/6");
+            m_trophies = new PSPConsoleActionWidget($"奖杯 0/{PSPConsoleState.GameCount * 3}");
             Add(m_play, m_homeWidgets);
             Add(m_trophies, m_homeWidgets);
             m_collectionTag = AddLabel("", m_collectionWidgets);
@@ -96,22 +99,23 @@ namespace Game {
             foreach (Widget widget in m_gameWidgets) widget.IsVisible = gaming;
             int selected = m_state.SelectedGame;
             m_clock.Text = DateTime.Now.ToString("HH:mm");
-            int trophyTotal = m_state.Progress.TrophyCount(0) + m_state.Progress.TrophyCount(1);
+            int trophyTotal = m_state.Progress.TotalTrophyCount();
+            int trophyMax = PSPConsoleState.GameCount * 3;
             m_title.Text = PSPConsoleState.CollectionName;
             m_description.Text = PSPConsoleState.CollectionDescription;
             m_tag.Text = PSPConsoleState.CollectionTag;
-            m_record.Text = $"奖杯 {trophyTotal}/6 · 乒乓胜 {m_state.Progress.PongWins} · 砖块最高 {m_state.Progress.BreakoutBestScore}";
-            m_trophies.Text = $"奖杯 {trophyTotal}/6";
+            m_record.Text = $"奖杯 {trophyTotal}/{trophyMax} · 乒乓胜 {m_state.Progress.PongWins} · 砖块最高 {m_state.Progress.BreakoutBestScore} · 方块最高 {m_state.Progress.TetrisBestScore}";
+            m_trophies.Text = $"奖杯 {trophyTotal}/{trophyMax}";
             m_play.Focused = m_state.HomeFocus == PSPHomeFocus.Play;
             m_trophies.Focused = m_state.HomeFocus == PSPHomeFocus.Trophies;
             m_collectionIcon.Selected = true;
             m_collectionIcon.Focused = m_state.HomeFocus == PSPHomeFocus.Play;
-            m_collectionTag.Text = selected == 0 ? "单人 AI  /  双人联机" : "单人游玩  /  街机挑战";
+            m_collectionTag.Text = selected == 0 ? "单人 AI  /  双人联机" : selected == 1 ? "单人游玩  /  街机挑战" : "单人游玩  /  原版方块消行";
             m_collectionTitle.Text = PSPConsoleState.GameNames[selected];
             m_collectionDescription.Text = PSPConsoleState.GameDescriptions[selected];
             m_collectionRecord.Text = selected == 0
                 ? $"获胜 {m_state.Progress.PongWins} 次 · 最长回合 {m_state.Progress.PongBestRally} 次接球"
-                : $"最高得分  {m_state.Progress.BreakoutBestScore}";
+                : selected == 1 ? $"最高得分  {m_state.Progress.BreakoutBestScore}" : $"最高得分  {m_state.Progress.TetrisBestScore}";
             m_collectionPlay.Focused = true;
             foreach (PSPGameTileWidget tile in m_tiles) {
                 tile.Selected = tile.GameIndex == selected;
@@ -141,7 +145,20 @@ namespace Game {
                 m_gameAction.Text = game.Phase == PSPGamePhase.Finished ? "再来一局" : game.IsPaused ? "继续" : game.Phase == PSPGamePhase.Ready ? "X 发球" : "暂停";
                 m_gameAction.Focused = overlay;
                 m_gameHelp.IsVisible = m_state.NotificationTime <= 0f;
-                if (game is PSPOnlinePongGame online) {
+                if (game is PSPTetrisGame tetris) {
+                    m_score.Text = $"得分 {tetris.Points}";
+                    m_status.Text = $"等级 {tetris.Level} · 行数 {tetris.Lines}";
+                    overlay = game.IsPaused || game.Phase == PSPGamePhase.Finished;
+                    m_message.IsVisible = m_messageHint.IsVisible = overlay;
+                    m_message.Text = game.Phase == PSPGamePhase.Finished ? "游戏结束" : "已暂停";
+                    m_messageHint.Text = game.Phase == PSPGamePhase.Finished ? $"得分 {tetris.Points} · X 再来一局 · O 返回" : "X 或 START 继续 · O 返回";
+                    m_gameAction.Text = game.Phase == PSPGamePhase.Finished ? "再来一局" : game.IsPaused ? "继续" : "暂停";
+                    m_gameAction.Focused = overlay;
+                    m_gameHelp.Text = "左右移动 · 上/X 旋转 · 下软降 · □/△ 硬降 · START 暂停";
+                    m_gameAction.IsEnabled = true;
+                    m_gameAction.IsVisible = true;
+                }
+                else if (game is PSPOnlinePongGame online) {
                     m_gameTitle.Text = "乒乓对决 / 联机";
                     m_status.Text = online.Status;
                     overlay = online.IsSynchronizing || game.Phase is PSPGamePhase.Ready or PSPGamePhase.Finished;
@@ -181,6 +198,7 @@ namespace Game {
 
         public override void ArrangeOverride() {
             Place(m_scene, 0f, 0f, 960f, 540f);
+            Place(m_board, 0f, 0f, 960f, 540f);
             Place(m_pongMenu, 0f, 0f, 960f, 540f);
             Label(m_header, 40f, 13f, 110f, 36f, 0.65f);
             Label(m_clock, 775f, 17f, 108f, 31f, 0.48f);

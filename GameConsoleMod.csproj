@@ -43,6 +43,7 @@
         <Compile Include="PSPConsoleOnlineState.cs" />
         <Compile Include="PSPConsoleProgress.cs" />
         <Compile Include="PSPPaddleGame.cs" />
+        <Compile Include="PSPTetrisGame.cs" />
         <Compile Include="PSPOnlinePongGame.cs" />
         <Compile Include="PSPPongMenuWidget.cs" />
         <Compile Include="PSPConsoleModelWidget.cs" />
