@@ -11,6 +11,7 @@ namespace Game {
         public bool IsTextInputActive => m_pongMenu.IsTextInputActive;
         public void EndTextInput() => m_pongMenu.EndTextInput();
         readonly PSPGameTileWidget[] m_tiles = new PSPGameTileWidget[PSPConsoleState.GameCount];
+        readonly PSPGameTileWidget m_collectionIcon;
         readonly List<Widget> m_homeWidgets = new(), m_collectionWidgets = new(), m_trophyWidgets = new(), m_gameWidgets = new();
         readonly LabelWidget m_header, m_clock, m_tag, m_title, m_description, m_record;
         readonly LabelWidget m_collectionTag, m_collectionTitle, m_collectionDescription, m_collectionRecord;
@@ -48,6 +49,8 @@ namespace Game {
             m_collectionBack = new PSPConsoleActionWidget("O 返回");
             Add(m_collectionPlay, m_collectionWidgets);
             Add(m_collectionBack, m_collectionWidgets);
+            m_collectionIcon = new PSPGameTileWidget(-1);
+            Add(m_collectionIcon, m_homeWidgets);
             m_trophyTitle = AddLabel("", m_trophyWidgets);
             m_trophyCount = AddLabel("", m_trophyWidgets, TextAnchor.Right | TextAnchor.VerticalCenter);
             for (int i = 0; i < 3; i++) {
@@ -101,6 +104,8 @@ namespace Game {
             m_trophies.Text = $"奖杯 {trophyTotal}/6";
             m_play.Focused = m_state.HomeFocus == PSPHomeFocus.Play;
             m_trophies.Focused = m_state.HomeFocus == PSPHomeFocus.Trophies;
+            m_collectionIcon.Selected = true;
+            m_collectionIcon.Focused = m_state.HomeFocus == PSPHomeFocus.Play;
             m_collectionTag.Text = selected == 0 ? "单人 AI  /  双人联机" : "单人游玩  /  街机挑战";
             m_collectionTitle.Text = PSPConsoleState.GameNames[selected];
             m_collectionDescription.Text = PSPConsoleState.GameDescriptions[selected];
@@ -188,6 +193,7 @@ namespace Game {
             m_record.Color = new Color(157, 174, 195);
             Button(m_play, 565f, 435f, 211f, 56f);
             Button(m_trophies, 791f, 435f, 131f, 56f, 0.42f);
+            Place(m_collectionIcon, 40f, 75f, 104f, 104f);
             float tileX = 40f;
             foreach (PSPGameTileWidget tile in m_tiles) {
                 float size = tile.Selected ? 104f : 78f;
@@ -225,7 +231,7 @@ namespace Game {
 
         public override void Update() {
             if (m_state.Page == PSPConsolePage.Home) {
-                if (m_play.IsClicked) {
+                if (m_play.IsClicked || m_collectionIcon.IsClicked) {
                     m_state.Focus(PSPHomeFocus.Play);
                     m_state.Pulse(PSPConsoleControl.Cross);
                     m_state.OpenCollection();

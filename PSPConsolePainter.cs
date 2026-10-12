@@ -108,12 +108,29 @@ namespace Game {
         public int GameIndex { get; }
         public bool Selected { get; set; }
         public bool Focused { get; set; }
+        /// <summary>GameIndex &lt; 0 draws the mini-game collection app icon on the home page.</summary>
         public PSPGameTileWidget(int index) { GameIndex = index; SoundName = "Audio/UI/ButtonClick"; }
         public override void MeasureOverride(Vector2 size) { DesiredSize = size; IsDrawRequired = true; }
         public override void Draw(DrawContext dc) {
             PSPConsolePainter p = new(this, dc.PrimitivesRenderer2D.FlatBatch(0, DepthStencilState.None), 100f, 100f);
             if (Selected) p.RoundedRect(0f, 0f, 100f, 100f, 16f, Focused ? Color.White : new Color(152, 169, 191));
-            p.RoundedRect(Selected ? 3f : 0f, Selected ? 3f : 0f, Selected ? 94f : 100f, Selected ? 94f : 100f, 13f,
+            float inset = Selected ? 3f : 0f, size = Selected ? 94f : 100f;
+            if (GameIndex < 0) {
+                p.RoundedRect(inset, inset, size, size, 13f, new Color(28, 48, 78));
+                // Two mini tiles + folder hint so the home page still shows an app icon.
+                p.RoundedRect(14f, 18f, 34f, 34f, 7f, new Color(19, 72, 109));
+                p.RoundedRect(22f, 26f, 18f, 4f, 2f, new Color(252, 182, 97));
+                p.Disc(31f, 38f, 4f, 4f, Color.White);
+                p.RoundedRect(52f, 18f, 34f, 34f, 7f, new Color(66, 28, 95));
+                p.Rect(56f, 24f, 12f, 5f, BrickColors[0]);
+                p.Rect(70f, 24f, 12f, 5f, BrickColors[1]);
+                p.Rect(56f, 32f, 12f, 5f, BrickColors[2]);
+                p.RoundedRect(18f, 62f, 64f, 22f, 6f, new Color(45, 72, 108));
+                p.RoundedRect(28f, 68f, 44f, 4f, 2f, new Color(173, 208, 234));
+                p.RoundedRect(34f, 76f, 32f, 3f, 1.5f, new Color(120, 150, 180));
+                return;
+            }
+            p.RoundedRect(inset, inset, size, size, 13f,
                 GameIndex == 0 ? new Color(19, 72, 109) : new Color(66, 28, 95));
             if (GameIndex == 0) {
                 p.RoundedRect(19f, 21f, 48f, 7f, 3f, new Color(252, 182, 97));
