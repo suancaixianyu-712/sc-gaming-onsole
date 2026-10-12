@@ -9,10 +9,10 @@ namespace Game {
         public string ServerAddress { get; set; } = DefaultServerAddress;
 
         // 默认联机入口；换入口只改这一行。
-        public const string DefaultServerAddress = "bot.suancaixianyu.cn:28886";
+        public const string DefaultServerAddress = "frp-art.com:39504";
 
         // 旧版默认/已下线地址：读档时自动换成当前默认值，玩家手填的其他地址保留。
-        static readonly string[] LegacyServerAddresses = ["", "1.95.85.178:8001", "1.95.85.178", "bot.suancaixianyu.cn:8001"];
+        static readonly string[] LegacyServerAddresses = ["", "1.95.85.178:8001", "1.95.85.178", "bot.suancaixianyu.cn:8001", "bot.suancaixianyu.cn:28886"];
 
         public static string MigrateServerAddress(string saved) {
             string text = (saved ?? "").Trim();
