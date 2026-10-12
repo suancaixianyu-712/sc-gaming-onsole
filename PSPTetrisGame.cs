@@ -78,7 +78,7 @@ namespace Game {
         public override void Confirm() {
             if (Phase == PSPGamePhase.Finished) Reset();
             else if (IsPaused) IsPaused = false;
-            else Rotate();
+            else HardDrop();
         }
 
         public override void TogglePause() {
@@ -89,9 +89,9 @@ namespace Game {
             if (control == PSPConsoleControl.Start) { TogglePause(); return; }
             if (IsPaused || Phase != PSPGamePhase.Playing) return;
             switch (control) {
-                case PSPConsoleControl.Up: Rotate(); break;
-                case PSPConsoleControl.Square:
-                case PSPConsoleControl.Triangle: HardDrop(); break;
+                case PSPConsoleControl.Up:
+                case PSPConsoleControl.Circle:
+                case PSPConsoleControl.Triangle: Rotate(); break;
             }
         }
 

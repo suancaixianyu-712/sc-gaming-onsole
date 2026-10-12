@@ -134,6 +134,7 @@ namespace Game {
             }
             if (gaming) {
                 PSPPaddleGame game = m_state.Game;
+                m_gameBack.Text = "O 返回";
                 m_gameTitle.Text = PSPConsoleState.GameNames[game.GameIndex];
                 m_score.Text = game.GameIndex == 0 ? $"{game.PlayerScore} : {game.OpponentScore}" : $"得分 {game.Score}";
                 m_status.Text = game.GameIndex == 0 ? "玩家 / AI · 先到 5 分" : $"生命 {game.Lives} · 砖块 {game.RemainingBricks}";
@@ -151,10 +152,11 @@ namespace Game {
                     overlay = game.IsPaused || game.Phase == PSPGamePhase.Finished;
                     m_message.IsVisible = m_messageHint.IsVisible = overlay;
                     m_message.Text = game.Phase == PSPGamePhase.Finished ? "游戏结束" : "已暂停";
-                    m_messageHint.Text = game.Phase == PSPGamePhase.Finished ? $"得分 {tetris.Points} · X 再来一局 · O 返回" : "X 或 START 继续 · O 返回";
+                    m_messageHint.Text = game.Phase == PSPGamePhase.Finished ? $"得分 {tetris.Points} · X 再来一局 · HOME 返回" : "X 或 START 继续 · HOME 返回";
                     m_gameAction.Text = game.Phase == PSPGamePhase.Finished ? "再来一局" : game.IsPaused ? "继续" : "暂停";
                     m_gameAction.Focused = overlay;
-                    m_gameHelp.Text = "左右移动 · 上/X 旋转 · 下软降 · □/△ 硬降 · START 暂停";
+                    m_gameHelp.Text = "左右移动 · ○/△ 旋转 · □ 软降 · X 硬降 · START 暂停 · HOME 返回";
+                    m_gameBack.Text = "返回";
                     m_gameAction.IsEnabled = true;
                     m_gameAction.IsVisible = true;
                 }

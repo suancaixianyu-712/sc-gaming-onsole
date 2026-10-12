@@ -55,7 +55,15 @@ namespace Game {
         }
 
         public void Activate(PSPConsoleControl control) {
-            if (control == PSPConsoleControl.Circle) { Back(); return; }
+            // Tetris: Circle rotates (not back). Leave via HOME / screen 返回 / Esc.
+            if (control == PSPConsoleControl.Circle) {
+                if (Page == PSPConsolePage.Game && Game is PSPTetrisGame) {
+                    Game.HandleButton(control);
+                    return;
+                }
+                Back();
+                return;
+            }
             if (control == PSPConsoleControl.Home) { ReturnHome(); return; }
             if (control == PSPConsoleControl.Cross) { Confirm(); return; }
             if (Page == PSPConsolePage.Game) {
@@ -196,7 +204,7 @@ namespace Game {
             if (Page == PSPConsolePage.Game && (Window.IsActive || Game.IsOnline)) {
                 float digital = (held[(int)PSPConsoleControl.Right] ? 1f : 0f) - (held[(int)PSPConsoleControl.Left] ? 1f : 0f);
                 bool usingDpad = held[(int)PSPConsoleControl.Right] || held[(int)PSPConsoleControl.Left];
-                if (Game is PSPTetrisGame tetris) tetris.SoftDrop = Window.IsActive && (held[(int)PSPConsoleControl.Down] || AnalogInput.Y > 0.6f);
+                if (Game is PSPTetrisGame tetris) tetris.SoftDrop = Window.IsActive && (held[(int)PSPConsoleControl.Square] || held[(int)PSPConsoleControl.Down] || AnalogInput.Y > 0.6f);
                 Game.Update(dt, Window.IsActive ? usingDpad ? digital : AnalogInput.X : 0f);
             }
         }
