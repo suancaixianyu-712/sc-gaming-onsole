@@ -1,0 +1,14 @@
+{
+  "bindAddress": "0.0.0.0",
+  "tcpPort": 26051,
+  "udpPort": 26052,
+  "tickRate": 60,
+  "maxClients": 256,
+  "maxRooms": 128,
+  "handshakeTimeoutSeconds": 10,
+  "idleTimeoutSeconds": 30,
+  "tcpMessagesPerSecond": 60,
+  "udpMessagesPerSecond": 120,
+  "tlsCertificatePath": "",
+  "tlsPasswordEnvironmentVariable": "GAMECONSOLE_CERT_PASSWORD"
+}

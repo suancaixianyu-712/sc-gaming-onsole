@@ -1,0 +1,7 @@
+<Mod>
+  <ProjectTemplate Name="Project" Guid="85023bf8-1c90-4dd1-9442-e6c13691d078">
+    <MemberSubsystemTemplate Name="GameConsoleBlockBehavior" Guid="b1d47793-79fa-4da3-ac3b-489a3b85db09" InheritanceParent="fefb9590-4972-4893-b02a-76063611b745">
+      <Parameter Name="Class" Guid="b672b68a-9bb6-48df-b711-3f130c9913ac" Value="Game.SubsystemGameConsoleBlockBehavior" Type="string" />
+    </MemberSubsystemTemplate>
+  </ProjectTemplate>
+</Mod>

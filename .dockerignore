@@ -1,0 +1,8 @@
+**/bin/
+**/obj/
+artifacts/
+ModelSource/
+Assets/
+*.scmod
+*.zip
+.git/

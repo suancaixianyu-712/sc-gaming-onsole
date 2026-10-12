@@ -1,0 +1,4 @@
+<Solution>
+    <Project Path="GameConsoleMod.csproj" />
+    <Project Path="Backend/GameConsoleServer.csproj" />
+</Solution>
