@@ -11,9 +11,10 @@ namespace Game {
         public bool IsTextInputActive => m_pongMenu.IsTextInputActive;
         public void EndTextInput() => m_pongMenu.EndTextInput();
         readonly PSPGameTileWidget[] m_tiles = new PSPGameTileWidget[PSPConsoleState.GameCount];
-        readonly List<Widget> m_homeWidgets = new(), m_trophyWidgets = new(), m_gameWidgets = new();
+        readonly List<Widget> m_homeWidgets = new(), m_collectionWidgets = new(), m_trophyWidgets = new(), m_gameWidgets = new();
         readonly LabelWidget m_header, m_clock, m_tag, m_title, m_description, m_record;
-        readonly PSPConsoleActionWidget m_play, m_trophies, m_trophyBack;
+        readonly LabelWidget m_collectionTag, m_collectionTitle, m_collectionDescription, m_collectionRecord;
+        readonly PSPConsoleActionWidget m_play, m_trophies, m_collectionPlay, m_collectionBack, m_trophyBack;
         readonly LabelWidget m_trophyTitle, m_trophyCount;
         readonly LabelWidget[] m_trophyNames = new LabelWidget[3], m_trophyDescriptions = new LabelWidget[3], m_trophyStatuses = new LabelWidget[3];
         readonly LabelWidget m_gameTitle, m_score, m_status, m_gameHelp, m_message, m_messageHint, m_notification;
@@ -31,14 +32,22 @@ namespace Game {
             m_title = AddLabel("", m_homeWidgets);
             m_description = AddLabel("", m_homeWidgets);
             m_record = AddLabel("", m_homeWidgets);
-            for (int i = 0; i < m_tiles.Length; i++) {
-                m_tiles[i] = new PSPGameTileWidget(i);
-                Add(m_tiles[i], m_homeWidgets);
-            }
-            m_play = new PSPConsoleActionWidget("开始游戏") { Primary = true };
-            m_trophies = new PSPConsoleActionWidget("奖杯 0/3");
+            m_play = new PSPConsoleActionWidget("进入合集") { Primary = true };
+            m_trophies = new PSPConsoleActionWidget("奖杯 0/6");
             Add(m_play, m_homeWidgets);
             Add(m_trophies, m_homeWidgets);
+            m_collectionTag = AddLabel("", m_collectionWidgets);
+            m_collectionTitle = AddLabel("", m_collectionWidgets);
+            m_collectionDescription = AddLabel("", m_collectionWidgets);
+            m_collectionRecord = AddLabel("", m_collectionWidgets);
+            for (int i = 0; i < m_tiles.Length; i++) {
+                m_tiles[i] = new PSPGameTileWidget(i);
+                Add(m_tiles[i], m_collectionWidgets);
+            }
+            m_collectionPlay = new PSPConsoleActionWidget("开始游戏") { Primary = true };
+            m_collectionBack = new PSPConsoleActionWidget("O 返回");
+            Add(m_collectionPlay, m_collectionWidgets);
+            Add(m_collectionBack, m_collectionWidgets);
             m_trophyTitle = AddLabel("", m_trophyWidgets);
             m_trophyCount = AddLabel("", m_trophyWidgets, TextAnchor.Right | TextAnchor.VerticalCenter);
             for (int i = 0; i < 3; i++) {
@@ -74,20 +83,31 @@ namespace Game {
 
         public void Refresh() {
             m_pongMenu.Refresh();
-            bool home = m_state.Page == PSPConsolePage.Home, trophies = m_state.Page == PSPConsolePage.Trophies, gaming = m_state.Page == PSPConsolePage.Game;
+            bool home = m_state.Page == PSPConsolePage.Home;
+            bool collection = m_state.Page == PSPConsolePage.Collection;
+            bool trophies = m_state.Page == PSPConsolePage.Trophies;
+            bool gaming = m_state.Page == PSPConsolePage.Game;
             foreach (Widget widget in m_homeWidgets) widget.IsVisible = home;
+            foreach (Widget widget in m_collectionWidgets) widget.IsVisible = collection;
             foreach (Widget widget in m_trophyWidgets) widget.IsVisible = trophies;
             foreach (Widget widget in m_gameWidgets) widget.IsVisible = gaming;
             int selected = m_state.SelectedGame;
             m_clock.Text = DateTime.Now.ToString("HH:mm");
-            m_title.Text = PSPConsoleState.GameNames[selected];
-            m_description.Text = PSPConsoleState.GameDescriptions[selected];
-            m_tag.Text = selected == 0 ? "单人 AI  /  双人联机" : "单人游玩  /  街机挑战";
-            m_record.Text = selected == 0 ? $"获胜 {m_state.Progress.PongWins} 次 · 最长回合 {m_state.Progress.PongBestRally} 次接球"
-                : $"最高得分  {m_state.Progress.BreakoutBestScore}";
-            m_trophies.Text = $"奖杯 {m_state.Progress.TrophyCount(selected)}/3";
+            int trophyTotal = m_state.Progress.TrophyCount(0) + m_state.Progress.TrophyCount(1);
+            m_title.Text = PSPConsoleState.CollectionName;
+            m_description.Text = PSPConsoleState.CollectionDescription;
+            m_tag.Text = PSPConsoleState.CollectionTag;
+            m_record.Text = $"奖杯 {trophyTotal}/6 · 乒乓胜 {m_state.Progress.PongWins} · 砖块最高 {m_state.Progress.BreakoutBestScore}";
+            m_trophies.Text = $"奖杯 {trophyTotal}/6";
             m_play.Focused = m_state.HomeFocus == PSPHomeFocus.Play;
             m_trophies.Focused = m_state.HomeFocus == PSPHomeFocus.Trophies;
+            m_collectionTag.Text = selected == 0 ? "单人 AI  /  双人联机" : "单人游玩  /  街机挑战";
+            m_collectionTitle.Text = PSPConsoleState.GameNames[selected];
+            m_collectionDescription.Text = PSPConsoleState.GameDescriptions[selected];
+            m_collectionRecord.Text = selected == 0
+                ? $"获胜 {m_state.Progress.PongWins} 次 · 最长回合 {m_state.Progress.PongBestRally} 次接球"
+                : $"最高得分  {m_state.Progress.BreakoutBestScore}";
+            m_collectionPlay.Focused = true;
             foreach (PSPGameTileWidget tile in m_tiles) {
                 tile.Selected = tile.GameIndex == selected;
                 tile.Focused = false;
@@ -159,21 +179,30 @@ namespace Game {
             Place(m_pongMenu, 0f, 0f, 960f, 540f);
             Label(m_header, 40f, 13f, 110f, 36f, 0.65f);
             Label(m_clock, 775f, 17f, 108f, 31f, 0.48f);
+            Label(m_tag, 42f, 298f, 485f, 32f, 0.43f);
+            Label(m_title, 40f, 331f, 500f, 60f, 1.05f);
+            Label(m_description, 42f, 401f, 520f, 31f, 0.44f);
+            Label(m_record, 42f, 439f, 520f, 28f, 0.38f);
+            m_tag.Color = new Color(173, 208, 234);
+            m_description.Color = new Color(204, 215, 231);
+            m_record.Color = new Color(157, 174, 195);
+            Button(m_play, 565f, 435f, 211f, 56f);
+            Button(m_trophies, 791f, 435f, 131f, 56f, 0.42f);
             float tileX = 40f;
             foreach (PSPGameTileWidget tile in m_tiles) {
                 float size = tile.Selected ? 104f : 78f;
                 Place(tile, tileX, 75f, size, size);
                 tileX += size + 16f;
             }
-            Label(m_tag, 42f, 298f, 485f, 32f, 0.43f);
-            Label(m_title, 40f, 331f, 500f, 60f, 1.05f);
-            Label(m_description, 42f, 401f, 485f, 31f, 0.44f);
-            Label(m_record, 42f, 439f, 482f, 28f, 0.38f);
-            m_tag.Color = new Color(173, 208, 234);
-            m_description.Color = new Color(204, 215, 231);
-            m_record.Color = new Color(157, 174, 195);
-            Button(m_play, 565f, 435f, 211f, 56f);
-            Button(m_trophies, 791f, 435f, 131f, 56f, 0.42f);
+            Label(m_collectionTag, 42f, 298f, 485f, 32f, 0.43f);
+            Label(m_collectionTitle, 40f, 331f, 500f, 60f, 1.05f);
+            Label(m_collectionDescription, 42f, 401f, 485f, 31f, 0.44f);
+            Label(m_collectionRecord, 42f, 439f, 482f, 28f, 0.38f);
+            m_collectionTag.Color = new Color(173, 208, 234);
+            m_collectionDescription.Color = new Color(204, 215, 231);
+            m_collectionRecord.Color = new Color(157, 174, 195);
+            Button(m_collectionPlay, 565f, 435f, 211f, 56f);
+            Button(m_collectionBack, 791f, 435f, 131f, 56f, 0.42f);
             Label(m_trophyTitle, 40f, 41f, 610f, 55f, 0.83f);
             Label(m_trophyCount, 675f, 63f, 245f, 32f, 0.45f);
             for (int i = 0; i < 3; i++) {
@@ -196,15 +225,25 @@ namespace Game {
 
         public override void Update() {
             if (m_state.Page == PSPConsolePage.Home) {
-                foreach (PSPGameTileWidget tile in m_tiles) if (tile.IsClicked) m_state.SelectGame(tile.GameIndex);
                 if (m_play.IsClicked) {
                     m_state.Focus(PSPHomeFocus.Play);
                     m_state.Pulse(PSPConsoleControl.Cross);
-                    m_state.StartGame();
+                    m_state.OpenCollection();
                 }
                 if (m_trophies.IsClicked) {
                     m_state.Focus(PSPHomeFocus.Trophies);
                     m_state.OpenTrophies();
+                }
+            }
+            else if (m_state.Page == PSPConsolePage.Collection) {
+                foreach (PSPGameTileWidget tile in m_tiles) if (tile.IsClicked) m_state.SelectGame(tile.GameIndex);
+                if (m_collectionPlay.IsClicked) {
+                    m_state.Pulse(PSPConsoleControl.Cross);
+                    m_state.StartGame();
+                }
+                if (m_collectionBack.IsClicked) {
+                    m_state.Pulse(PSPConsoleControl.Circle);
+                    m_state.Back();
                 }
             }
             else if (m_state.Page == PSPConsolePage.Trophies) {

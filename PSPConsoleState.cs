@@ -3,13 +3,16 @@ using Engine;
 using GameConsole.Networking;
 
 namespace Game {
-    public enum PSPConsolePage { Home, Trophies, Game, PongMode, OnlineLobby }
+    public enum PSPConsolePage { Home, Collection, Trophies, Game, PongMode, OnlineLobby }
     public enum PSPHomeFocus { Play, Trophies }
 
     public sealed partial class PSPConsoleState : IDisposable {
         public const int GameCount = 2;
         public static readonly string[] GameNames = ["乒乓对决", "乒乓打砖块"];
         public static readonly string[] GameDescriptions = ["单人 AI 或双人联机，率先取得 5 分。", "左右移动挡板，击破所有砖块。"];
+        public const string CollectionName = "小游戏合集";
+        public const string CollectionTag = "合集  /  现有小游戏";
+        public const string CollectionDescription = "乒乓对决、乒乓打砖块。进入合集后选择要玩的游戏。";
         readonly float[] m_releaseDelays = new float[(int)PSPConsoleControl.Count];
         Vector2 m_analogTarget;
 
@@ -68,11 +71,14 @@ namespace Game {
                 }
                 return;
             }
-            if (Page != PSPConsolePage.Home) return;
-            if (control == PSPConsoleControl.LeftShoulder || control == PSPConsoleControl.RightShoulder) {
-                SwitchGame(control == PSPConsoleControl.LeftShoulder ? -1 : 1);
+            if (Page == PSPConsolePage.Collection) {
+                int direction = control is PSPConsoleControl.Left or PSPConsoleControl.Up or PSPConsoleControl.LeftShoulder ? -1
+                    : control is PSPConsoleControl.Right or PSPConsoleControl.Down or PSPConsoleControl.RightShoulder ? 1 : 0;
+                if (direction != 0) SwitchGame(direction);
                 return;
             }
+            if (Page != PSPConsolePage.Home) return;
+            // Home is the collection shell; shoulder buttons do not switch games here.
             switch (control) {
                 case PSPConsoleControl.Left:
                 case PSPConsoleControl.Up:
@@ -87,12 +93,12 @@ namespace Game {
         }
 
         public void SelectGame(int index) {
-            if (Page == PSPConsolePage.Game) return;
+            if (Page is PSPConsolePage.Game or PSPConsolePage.PongMode or PSPConsolePage.OnlineLobby) return;
             SelectedGame = Math.Clamp(index, 0, GameCount - 1);
         }
 
         public void SwitchGame(int direction) {
-            if (Page == PSPConsolePage.Game) return;
+            if (Page is PSPConsolePage.Game or PSPConsolePage.PongMode or PSPConsolePage.OnlineLobby) return;
             SelectedGame = (SelectedGame + direction % GameCount + GameCount) % GameCount;
         }
 
@@ -102,9 +108,16 @@ namespace Game {
             if (Page == PSPConsolePage.Game) Game.Confirm();
             else if (Page == PSPConsolePage.PongMode) { if (ModeSelection == 0) StartAiPong(); else OpenOnlineLobby(); }
             else if (Page == PSPConsolePage.OnlineLobby) ActivateLobbySelection();
+            else if (Page == PSPConsolePage.Collection) StartGame();
             else if (Page == PSPConsolePage.Trophies) ReturnHome();
             else if (HomeFocus == PSPHomeFocus.Trophies) OpenTrophies();
-            else StartGame();
+            else OpenCollection();
+        }
+
+        public void OpenCollection() {
+            if (Page != PSPConsolePage.Home) return;
+            Page = PSPConsolePage.Collection;
+            ResetAnalog();
         }
 
         public void StartGame() {
@@ -132,12 +145,20 @@ namespace Game {
                 if (OnlineRoom != null) LeaveOnlineRoom();
                 else { DisconnectOnline(); Page = PSPConsolePage.PongMode; ModeSelection = 1; }
             }
-            else ReturnHome();
+            else if (Page is PSPConsolePage.Collection or PSPConsolePage.Trophies) ReturnHome();
+            else ReturnToCollection();
         }
 
         public void ReturnHome() {
             if (Network.IsConnected || OnlineBusy) DisconnectOnline();
             Page = PSPConsolePage.Home;
+            Game = null;
+            ResetAnalog();
+        }
+
+        public void ReturnToCollection() {
+            if (Network.IsConnected || OnlineBusy) DisconnectOnline();
+            Page = PSPConsolePage.Collection;
             Game = null;
             ResetAnalog();
         }
@@ -157,7 +178,8 @@ namespace Game {
             catch (Exception exception) { Log.Error($"游戏机网络消息处理失败：{exception.Message}"); }
             UpdateLobbyRefresh();
             float dt = Math.Clamp(deltaTime, 0f, 0.1f);
-            BackgroundBlend += ((SelectedGame == 0 ? 0f : 1f) - BackgroundBlend) * (1f - MathF.Exp(-9f * dt));
+            float blendTarget = Page == PSPConsolePage.Home ? 0.35f : SelectedGame == 0 ? 0f : 1f;
+            BackgroundBlend += (blendTarget - BackgroundBlend) * (1f - MathF.Exp(-9f * dt));
             NotificationTime = MathF.Max(0f, NotificationTime - dt);
             AnalogOffset += (m_analogTarget - AnalogOffset) * (1f - MathF.Exp(-(IsAnalogHeld ? 45f : 24f) * dt));
             if (Vector2.Distance(AnalogOffset, m_analogTarget) < 0.003f) AnalogOffset = m_analogTarget;

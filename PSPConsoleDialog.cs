@@ -198,7 +198,8 @@ namespace Game {
             m_hint.Text = m_state.Page switch {
                 PSPConsolePage.Game when m_state.Game.IsOnline => "摇杆 / 方向键左右移动 · O 离开 · 联机比赛持续进行",
                 PSPConsolePage.Game => "摇杆 / 方向键左右移动 · X 发球 · O 返回 · START 暂停",
-                PSPConsolePage.Home => "L / R 切换游戏 · 方向键选择 · X 确认 · O 返回",
+                PSPConsolePage.Home => "方向键选择 · X 进入合集 · O 关闭",
+                PSPConsolePage.Collection => "L / R 或方向键切换游戏 · X 开始 · O 返回主页",
                 PSPConsolePage.Trophies => "X / O 返回主页",
                 _ => "方向键选择 · X 确认 · O 返回"
             };
