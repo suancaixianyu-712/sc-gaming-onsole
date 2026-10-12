@@ -37,6 +37,7 @@ namespace GameConsole.Backend {
         public string GameId { get; init; }
         public int Capacity { get; init; }
         public bool RequiresUdp { get; init; }
+        public bool IsPrivate { get; init; }
         public Guid HostId { get; set; }
         public Guid MatchId { get; set; }
         public long Revision { get; set; }
@@ -57,7 +58,8 @@ namespace GameConsole.Backend {
 
         public RoomSummary Summary() => new() {
             RoomId = Id, Name = Name, GameId = GameId, Capacity = Capacity,
-            PlayerCount = Players.Count, RequiresUdp = RequiresUdp, Started = Started
+            PlayerCount = Players.Count, RequiresUdp = RequiresUdp, Started = Started,
+            HostName = Players.FirstOrDefault(player => player.PlayerId == HostId)?.Name
         };
     }
 }

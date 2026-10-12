@@ -155,6 +155,7 @@ namespace Game {
             PumpOnlineActions();
             try { Network.Pump(); }
             catch (Exception exception) { Log.Error($"游戏机网络消息处理失败：{exception.Message}"); }
+            UpdateLobbyRefresh();
             float dt = Math.Clamp(deltaTime, 0f, 0.1f);
             BackgroundBlend += ((SelectedGame == 0 ? 0f : 1f) - BackgroundBlend) * (1f - MathF.Exp(-9f * dt));
             NotificationTime = MathF.Max(0f, NotificationTime - dt);

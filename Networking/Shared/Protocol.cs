@@ -45,6 +45,8 @@ namespace GameConsole.Networking {
         public string GameId { get; set; }
         public int Capacity { get; set; }
         public bool RequiresUdp { get; set; }
+        // 1.4.2: private rooms are hidden from ListRooms and joinable only by code. Default public.
+        public bool IsPrivate { get; set; }
         public bool Ready { get; set; }
         public bool UdpConnected { get; set; }
         public Guid MatchId { get; set; }
@@ -74,6 +76,9 @@ namespace GameConsole.Networking {
         public int PlayerCount { get; set; }
         public bool RequiresUdp { get; set; }
         public bool Started { get; set; }
+        // Added in 1.4.2 (optional): older servers leave these null.
+        public string HostName { get; set; }
+        [JsonIgnore] public bool Joinable => !Started && PlayerCount < Capacity;
     }
 
     public sealed class RoomSnapshot {

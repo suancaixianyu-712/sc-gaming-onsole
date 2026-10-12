@@ -198,7 +198,9 @@ namespace GameConsole.Backend {
                 case MessageType.ListRooms:
                     Send(session, new ControlMessage {
                         Type = MessageType.RoomList, RequestId = message.RequestId,
-                        Rooms = m_rooms.Values.Where(room => string.IsNullOrEmpty(message.GameId) || room.GameId == message.GameId)
+                        // Lobby only lists public rooms that are waiting and not full.
+                        Rooms = m_rooms.Values.Where(room => (string.IsNullOrEmpty(message.GameId) || room.GameId == message.GameId)
+                                && !room.IsPrivate && !room.Started && room.Players.Count < room.Capacity)
                             .Take(100).Select(room => room.Summary()).ToArray()
                     });
                     break;
@@ -238,7 +240,7 @@ namespace GameConsole.Backend {
             do { id = Convert.ToHexString(RandomNumberGenerator.GetBytes(3)); } while (m_rooms.ContainsKey(id));
             Room room = new() {
                 Id = id, Name = CleanName(request.RoomName, 40), GameId = request.GameId,
-                Capacity = request.Capacity, RequiresUdp = request.RequiresUdp, HostId = session.PlayerId
+                Capacity = request.Capacity, RequiresUdp = request.RequiresUdp, IsPrivate = request.IsPrivate, HostId = session.PlayerId
             };
             m_rooms.Add(id, room);
             AddPlayer(room, session);
@@ -248,10 +250,10 @@ namespace GameConsole.Backend {
         void JoinRoom(ClientSession session, ControlMessage request) {
             if (session.Room != null) { Error(session, request, "already_in_room", "请先离开当前房间。"); return; }
             if (request.RoomId == null || request.RoomId.Length > 16 || !m_rooms.TryGetValue(request.RoomId, out Room room)) {
-                Error(session, request, "room_not_found", "房间不存在。"); return;
+                Error(session, request, "room_not_found", "房间已解散。"); return;
             }
             if (room.Started || room.Players.Count >= room.Capacity) {
-                Error(session, request, room.Started ? "match_running" : "room_full", "当前房间不能加入。"); return;
+                Error(session, request, room.Started ? "match_running" : "room_full", room.Started ? "对局已开始。" : "房间已满。"); return;
             }
             AddPlayer(room, session);
             Ack(session, request, room);
@@ -325,7 +327,18 @@ namespace GameConsole.Backend {
                 m_rooms.Remove(room.Id);
                 return;
             }
-            if (room.HostId == session.PlayerId) room.HostId = room.Players[0].PlayerId;
+            if (room.HostId == session.PlayerId) {
+                // Host left or disconnected: dissolve the room so it vanishes from the lobby immediately.
+                if (room.Started) FinishMatch(room, "player_left");
+                foreach (ClientSession member in room.Players.ToArray()) {
+                    member.Room = null;
+                    member.Ready = false;
+                    Send(member, new ControlMessage { Type = MessageType.RoomChanged, Message = "host_left" });
+                }
+                room.Players.Clear();
+                m_rooms.Remove(room.Id);
+                return;
+            }
             if (room.Started) FinishMatch(room, "player_left");
             else PublishRoom(room);
         }

@@ -119,8 +119,8 @@ namespace GameConsole.Networking {
             (await RequestAsync(new ControlMessage { Type = MessageType.ListRooms, GameId = gameId }, cancellationToken).ConfigureAwait(false)).Rooms;
 
         public async Task<RoomSnapshot> CreateRoomAsync(string gameId, string name, int capacity = 2, bool requiresUdp = false,
-            CancellationToken cancellationToken = default) => (await RequestAsync(new ControlMessage {
-                Type = MessageType.CreateRoom, GameId = gameId, RoomName = name, Capacity = capacity, RequiresUdp = requiresUdp
+            CancellationToken cancellationToken = default, bool isPrivate = false) => (await RequestAsync(new ControlMessage {
+                Type = MessageType.CreateRoom, GameId = gameId, RoomName = name, Capacity = capacity, RequiresUdp = requiresUdp, IsPrivate = isPrivate
             }, cancellationToken).ConfigureAwait(false)).Room;
 
         public async Task<RoomSnapshot> JoinRoomAsync(string roomId, CancellationToken cancellationToken = default) =>
