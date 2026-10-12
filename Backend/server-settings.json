@@ -2,6 +2,8 @@
   "bindAddress": "0.0.0.0",
   "tcpPort": 28886,
   "udpPort": 28887,
+  "publicUdpHost": "",
+  "publicUdpPort": 0,
   "tickRate": 60,
   "maxClients": 256,
   "maxRooms": 128,

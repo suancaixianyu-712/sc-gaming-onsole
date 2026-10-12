@@ -53,6 +53,7 @@ namespace GameConsole.Networking {
         string m_token;
         bool m_serverUdpBound;
         int m_udpPort;
+        string m_udpHost;
         long m_nextUdpAttempt;
         uint m_sendSequence;
         int m_started, m_closed;
@@ -244,6 +245,7 @@ namespace GameConsole.Networking {
                 PlayerId = message.PlayerId;
                 m_token = message.SessionToken;
                 m_udpPort = message.UdpPort;
+                m_udpHost = string.IsNullOrWhiteSpace(message.UdpHost) ? m_options.Host : message.UdpHost.Trim();
                 m_connected = true;
                 if (m_options.EnableRealtime) InitializeUdp();
                 m_welcome.TrySetResult(message);
@@ -306,7 +308,7 @@ namespace GameConsole.Networking {
             credentials.Put(PlayerId.ToString());
             credentials.Put(m_token);
             m_nextUdpAttempt = Environment.TickCount64 + 8000;
-            m_peer = m_udp.Connect(m_options.Host, m_udpPort, credentials);
+            m_peer = m_udp.Connect(m_udpHost ?? m_options.Host, m_udpPort, credentials);
         }
 
         void SetUdpReady(bool ready) {

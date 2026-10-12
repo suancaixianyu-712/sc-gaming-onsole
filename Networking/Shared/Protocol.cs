@@ -39,6 +39,7 @@ namespace GameConsole.Networking {
         public string PlayerName { get; set; }
         public string SessionToken { get; set; }
         public int UdpPort { get; set; }
+        public string UdpHost { get; set; }
         public string RoomId { get; set; }
         public string RoomName { get; set; }
         public string GameId { get; set; }

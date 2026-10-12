@@ -185,7 +185,9 @@ namespace GameConsole.Backend {
                 session.Authenticated = true;
                 Send(session, new ControlMessage {
                     Type = MessageType.Welcome, RequestId = message.RequestId, PlayerId = session.PlayerId,
-                    PlayerName = name, SessionToken = session.Token, UdpPort = m_options.UdpPort
+                    PlayerName = name, SessionToken = session.Token,
+                    UdpPort = m_options.PublicUdpPort > 0 ? m_options.PublicUdpPort : m_options.UdpPort,
+                    UdpHost = string.IsNullOrWhiteSpace(m_options.PublicUdpHost) ? null : m_options.PublicUdpHost.Trim()
                 });
                 return;
             }
