@@ -20,7 +20,7 @@ namespace Game {
                     PongWins = Math.Max(0, saved.GetValue("PongWins", 0)),
                     PongBestRally = Math.Max(0, saved.GetValue("PongBestRally", 0)),
                     BreakoutBestScore = Math.Max(0, saved.GetValue("BreakoutBestScore", 0)),
-                    ServerAddress = saved.GetValue("ServerAddress", "bot.suancaixianyu.cn:28886")
+                    ServerAddress = PSPConsoleProgress.MigrateServerAddress(saved.GetValue("ServerAddress", ""))
                 };
             }
         }

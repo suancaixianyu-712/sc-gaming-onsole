@@ -6,7 +6,21 @@ namespace Game {
         public int PongWins { get; set; }
         public int PongBestRally { get; set; }
         public int BreakoutBestScore { get; set; }
-        public string ServerAddress { get; set; } = "bot.suancaixianyu.cn:28886";
+        public string ServerAddress { get; set; } = DefaultServerAddress;
+
+        // 默认联机入口；换入口只改这一行。
+        public const string DefaultServerAddress = "bot.suancaixianyu.cn:28886";
+
+        // 旧版默认/已下线地址：读档时自动换成当前默认值，玩家手填的其他地址保留。
+        static readonly string[] LegacyServerAddresses = ["", "1.95.85.178:8001", "1.95.85.178", "bot.suancaixianyu.cn:8001"];
+
+        public static string MigrateServerAddress(string saved) {
+            string text = (saved ?? "").Trim();
+            foreach (string legacy in LegacyServerAddresses) {
+                if (string.Equals(text, legacy, System.StringComparison.OrdinalIgnoreCase)) return DefaultServerAddress;
+            }
+            return text;
+        }
 
         public static readonly string[] TrophyNames = ["首个得分", "战胜 AI", "完美对局", "首次击破", "高分挑战", "清空球场"];
         public static readonly string[] TrophyDescriptions = ["乒乓对战中获得 1 分", "率先得到 5 分，赢下比赛", "以 5 : 0 战胜 AI", "击破任意一块砖块", "单局打砖块获得 500 分", "击破全部 40 块砖块"];
