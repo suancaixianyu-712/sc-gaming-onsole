@@ -7,7 +7,7 @@
 | TCP | .NET `System.Net.Sockets` | 会话、房间、准备/开局、可靠游戏事件 | 单帧 64 KiB；游戏负载 16 KiB |
 | UDP | LiteNetLib 2.1.4 `DeliveryMethod.Sequenced` | 实时输入/整帧快照 | 游戏负载 900 字节 |
 
-TCP 默认端口 26051，UDP 默认端口 26052。UDP 不是裸数据报端口，外部客户端也必须使用 LiteNetLib 的连接和数据帧格式。
+TCP 默认端口 28886，UDP 默认端口 28887。UDP 不是裸数据报端口，外部客户端也必须使用 LiteNetLib 的连接和数据帧格式。
 
 ## TCP 格式
 

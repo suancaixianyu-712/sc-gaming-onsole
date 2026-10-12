@@ -9,5 +9,5 @@ FROM mcr.microsoft.com/dotnet/runtime:10.0
 WORKDIR /app
 COPY --from=build /publish/ ./
 USER $APP_UID
-EXPOSE 26051/tcp 26052/udp
+EXPOSE 28886/tcp 28887/udp
 ENTRYPOINT ["dotnet", "GameConsoleServer.dll"]

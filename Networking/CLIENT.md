@@ -22,7 +22,7 @@ network.Disconnected += reason => { /* 回到大厅，显示断线原因。 */ }
 
 await network.ConnectAsync(new GameConsoleConnectionOptions {
     Host = "服务器 IP 或域名",
-    TcpPort = 26051,
+    TcpPort = 28886,
     PlayerName = "玩家昵称",
     EnableRealtime = true,
     UseTls = false // 与后端证书设置一致

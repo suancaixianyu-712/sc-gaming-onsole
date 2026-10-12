@@ -13,7 +13,7 @@ namespace Game {
         readonly LabelWidget m_modeTitle, m_modeDescription, m_title, m_serverCaption, m_status, m_roomTitle, m_roomHelp, m_codeCaption, m_footer;
         readonly LabelWidget[] m_players = new LabelWidget[2];
         readonly PSPConsoleActionWidget[] m_modes = new PSPConsoleActionWidget[2], m_actions = new PSPConsoleActionWidget[4];
-        readonly TextBoxWidget m_server = new() { MaximumLength = 200, AutoSize = false, Title = "服务器地址", Description = "IP:26051 或 tls://域名:26051" };
+        readonly TextBoxWidget m_server = new() { MaximumLength = 200, AutoSize = false, Title = "服务器地址", Description = "IP:28886 或 tls://域名:28886" };
         readonly TextBoxWidget m_code = new() { MaximumLength = 6, AutoSize = false, Title = "房间码", Description = "输入朋友分享的 6 位房间码" };
         readonly PSPConsoleActionWidget m_back = new("O 返回");
         int m_editGuardFrames;
@@ -94,7 +94,7 @@ namespace Game {
             RoomSnapshot room = m_state.OnlineRoom;
             m_code.IsVisible = m_codeCaption.IsVisible = lobby && room == null;
             m_roomTitle.Text = room == null ? "和朋友在同一服务器，创建房间或输入房间码。" : $"房间码  {room.RoomId}  ·  {room.Players.Length}/2 人";
-            m_roomHelp.Text = room == null ? "服务器默认 TCP 26051 / UDP 26052" : "双方准备、UDP 就绪后，由房主开始游戏。";
+            m_roomHelp.Text = room == null ? "服务器默认 TCP 28886 / UDP 28887" : "双方准备、UDP 就绪后，由房主开始游戏。";
             for (int i = 0; i < 2; i++) {
                 m_players[i].IsVisible = lobby && room != null;
                 PlayerSummary player = room?.Players.OrderBy(member => member.Seat).ElementAtOrDefault(i);

@@ -25,7 +25,7 @@ TCP 使用 .NET 自带的 `System.Net.Sockets`，UDP 使用 [LiteNetLib 2.1.4](h
 dotnet GameConsoleServer.dll
 ```
 
-默认加载程序旁的 `server-settings.json`，监听 **TCP 26051** 和 **UDP 26052**。服务器防火墙和云安全组需要开放对应端口；客户端填写服务器 IP 或域名及 TCP 端口，UDP 端口由后端下发。
+默认加载程序旁的 `server-settings.json`，监听 **TCP 28886** 和 **UDP 28887**。服务器防火墙和云安全组需要开放对应端口；客户端填写服务器 IP 或域名及 TCP 端口，UDP 端口由后端下发。
 
 指定配置文件：
 
@@ -65,7 +65,7 @@ dotnet artifacts/server/GameConsoleServer.dll
 
 ```sh
 docker build -f Backend/Dockerfile -t gameconsole-server .
-docker run --rm --name gameconsole-server -p 26051:26051/tcp -p 26052:26052/udp gameconsole-server
+docker run --rm --name gameconsole-server -p 28886:28886/tcp -p 28887:28887/udp gameconsole-server
 ```
 
 自定义配置可挂载到 `/app/server-settings.json`。如果修改配置中的端口，也需要调整 Docker 映射。

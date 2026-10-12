@@ -6,8 +6,8 @@ namespace GameConsole.Networking {
     public static class ConsoleProtocol {
         public const int Version = 1;
         public const string ApplicationKey = "codex.GameConsole/v1";
-        public const int DefaultTcpPort = 26051;
-        public const int DefaultUdpPort = 26052;
+        public const int DefaultTcpPort = 28886;
+        public const int DefaultUdpPort = 28887;
         public const int MaxFrameBytes = 65536;
         public const int MaxReliablePayloadBytes = 16384;
         public const int MaxRealtimePayloadBytes = 900;

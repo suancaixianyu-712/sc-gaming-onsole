@@ -103,7 +103,7 @@ namespace Game {
                 || string.IsNullOrEmpty(address.Host) || !string.IsNullOrEmpty(address.UserInfo)
                 || address.AbsolutePath is not ("" or "/") || !string.IsNullOrEmpty(address.Query) || !string.IsNullOrEmpty(address.Fragment)
                 || address.HostNameType == UriHostNameType.IPv6 || address.Port is 0 or > 65535) {
-                Notice("地址格式：IP:26051 或 tls://域名:26051。"); return;
+                Notice("地址格式：IP:28886 或 tls://域名:28886。"); return;
             }
             Network.Dispose();
             Network = new GameConsoleClient();
