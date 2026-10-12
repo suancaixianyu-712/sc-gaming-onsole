@@ -152,11 +152,14 @@ namespace Game {
                     overlay = game.IsPaused || game.Phase == PSPGamePhase.Finished;
                     m_message.IsVisible = m_messageHint.IsVisible = overlay;
                     m_message.Text = game.Phase == PSPGamePhase.Finished ? "游戏结束" : "已暂停";
-                    m_messageHint.Text = game.Phase == PSPGamePhase.Finished ? $"得分 {tetris.Points} · X 再来一局 · HOME 返回" : "X 或 START 继续 · HOME 返回";
+                    m_messageHint.Text = game.Phase == PSPGamePhase.Finished
+                        ? $"得分 {tetris.Points} · X 再来一局 · HOME 返回"
+                        : "X 或 START 继续 · HOME 返回";
                     m_gameAction.Text = game.Phase == PSPGamePhase.Finished ? "再来一局" : game.IsPaused ? "继续" : "暂停";
                     m_gameAction.Focused = overlay;
-                    m_gameHelp.Text = "左右移动 · ○/△ 旋转 · □ 软降 · X 硬降 · START 暂停 · HOME 返回";
-                    m_gameBack.Text = "返回";
+                    // 右侧短提示；完整映射在 Dialog 底栏。
+                    m_gameHelp.Text = "○/△ 转 · □ 软降 · X 硬降";
+                    m_gameBack.Text = "HOME 返回";
                     m_gameAction.IsEnabled = true;
                     m_gameAction.IsVisible = true;
                 }
@@ -238,14 +241,36 @@ namespace Game {
                 Label(m_trophyStatuses[i], 733f, y + 22f, 158f, 31f, 0.46f);
             }
             Button(m_trophyBack, 751f, 465f, 169f, 47f, 0.48f);
-            Label(m_gameTitle, 28f, 14f, 300f, 35f, 0.54f);
-            Label(m_score, 330f, 9f, 300f, 46f, 0.78f);
-            Label(m_status, 656f, 18f, 274f, 31f, 0.4f);
-            Label(m_message, 250f, 245f, 460f, 43f, 0.87f);
-            Label(m_messageHint, 250f, 303f, 460f, 31f, 0.39f);
-            Label(m_gameHelp, 147f, 505f, 624f, 26f, 0.33f);
-            Button(m_gameBack, 28f, 505f, 112f, 30f, 0.3f);
-            Button(m_gameAction, 785f, 505f, 147f, 30f, 0.32f);
+            bool tetrisLayout = m_state.Page == PSPConsolePage.Game && m_state.Game is PSPTetrisGame;
+            if (tetrisLayout) {
+                // 左：标题 / 得分 / 等级·行数；右：下一块预览旁短提示；场地铺满中间。
+                m_gameTitle.TextAnchor = TextAnchor.Left | TextAnchor.VerticalCenter;
+                m_score.TextAnchor = TextAnchor.Left | TextAnchor.VerticalCenter;
+                m_status.TextAnchor = TextAnchor.Left | TextAnchor.VerticalCenter;
+                m_gameHelp.TextAnchor = TextAnchor.Left | TextAnchor.VerticalCenter;
+                Label(m_gameTitle, 16f, 24f, 300f, 36f, 0.52f);
+                Label(m_score, 16f, 70f, 300f, 40f, 0.72f);
+                Label(m_status, 16f, 120f, 300f, 34f, 0.42f);
+                Label(m_gameHelp, 640f, 220f, 300f, 34f, 0.34f);
+                Label(m_message, 310f, 220f, 340f, 42f, 0.78f);
+                Label(m_messageHint, 310f, 268f, 340f, 36f, 0.34f);
+                Button(m_gameBack, 16f, 490f, 140f, 30f, 0.3f);
+                Button(m_gameAction, 790f, 490f, 150f, 30f, 0.32f);
+            }
+            else {
+                m_gameTitle.TextAnchor = TextAnchor.Left | TextAnchor.VerticalCenter;
+                m_score.TextAnchor = TextAnchor.Center;
+                m_status.TextAnchor = TextAnchor.Right | TextAnchor.VerticalCenter;
+                m_gameHelp.TextAnchor = TextAnchor.Center;
+                Label(m_gameTitle, 28f, 14f, 300f, 35f, 0.54f);
+                Label(m_score, 330f, 9f, 300f, 46f, 0.78f);
+                Label(m_status, 656f, 18f, 274f, 31f, 0.4f);
+                Label(m_message, 250f, 245f, 460f, 43f, 0.87f);
+                Label(m_messageHint, 250f, 303f, 460f, 31f, 0.39f);
+                Label(m_gameHelp, 147f, 505f, 624f, 26f, 0.33f);
+                Button(m_gameBack, 28f, 505f, 112f, 30f, 0.3f);
+                Button(m_gameAction, 785f, 505f, 147f, 30f, 0.32f);
+            }
             Label(m_notification, 298f, 505f, 436f, 28f, 0.38f);
         }
 

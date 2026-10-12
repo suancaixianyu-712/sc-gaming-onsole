@@ -236,7 +236,8 @@ namespace Game {
 
     /// <summary>在一个 Widget 里循环 DrawBlock（UI 模式）绘制场地、边框与预览。放在场景背景之后（独立绘制层）。</summary>
     public sealed class PSPTetrisBoardWidget : Widget {
-        public const float Cell = 20f, FieldX = 380f, FieldY = 78f, PreviewX = 650f, PreviewY = 110f;
+        // Cell 正方形；场地尽量铺满 540 高，左右只留窄侧栏。边框占 (Rows+1) 格高。
+        public const float Cell = 24f, FieldX = 360f, FieldY = 18f, PreviewX = 660f, PreviewY = 88f;
         readonly PSPConsoleState m_state;
         readonly DrawBlockEnvironmentData m_environment = new() { DrawBlockMode = DrawBlockMode.UI, Light = 15 };
 
@@ -261,18 +262,25 @@ namespace Game {
                 DrawCell(r, border, PSPTetrisGame.Columns, y, tint);
             }
             for (int x = 0; x < PSPTetrisGame.Columns; x++) DrawCell(r, border, x, PSPTetrisGame.Rows, tint);
-            bool hide = game.IsPaused || game.Phase == PSPGamePhase.Finished;
-            if (hide) return; // 暂停/结束时让出场地给提示框
+            // 暂停/结束仍画场地，不缩小格子；仅压暗，提示框叠在场地中央。
+            bool dim = game.IsPaused || game.Phase == PSPGamePhase.Finished;
+            Color cellTint = dim ? Color.MultiplyColorOnly(tint, 0.45f) : tint;
             for (int x = 0; x < PSPTetrisGame.Columns; x++)
                 for (int y = 0; y < PSPTetrisGame.Rows; y++)
-                    if (game.Cells[x, y] >= 0) DrawCell(r, PSPTetrisBlocks.Material(game.Cells[x, y]), x, y, tint);
+                    if (game.Cells[x, y] >= 0) DrawCell(r, PSPTetrisBlocks.Material(game.Cells[x, y]), x, y, cellTint);
             int value = PSPTetrisBlocks.Material(game.PieceMaterial);
             int ghost = game.GhostY;
-            foreach (Point2 c in PSPTetrisGame.GetCells(game.PieceShape, game.PieceRotation)) {
-                if (ghost != game.PieceY && game.PieceY + c.Y >= 0) DrawCell(r, value, game.PieceX + c.X, ghost + c.Y, Color.MultiplyColorOnly(tint, 0.35f), 0.6f);
+            if (!dim) {
+                foreach (Point2 c in PSPTetrisGame.GetCells(game.PieceShape, game.PieceRotation)) {
+                    if (ghost != game.PieceY && game.PieceY + c.Y >= 0) DrawCell(r, value, game.PieceX + c.X, ghost + c.Y, Color.MultiplyColorOnly(tint, 0.35f), 0.6f);
+                }
+                foreach (Point2 c in PSPTetrisGame.GetCells(game.PieceShape, game.PieceRotation))
+                    if (game.PieceY + c.Y >= 0) DrawCell(r, value, game.PieceX + c.X, game.PieceY + c.Y, tint);
             }
-            foreach (Point2 c in PSPTetrisGame.GetCells(game.PieceShape, game.PieceRotation))
-                if (game.PieceY + c.Y >= 0) DrawCell(r, value, game.PieceX + c.X, game.PieceY + c.Y, tint);
+            else {
+                foreach (Point2 c in PSPTetrisGame.GetCells(game.PieceShape, game.PieceRotation))
+                    if (game.PieceY + c.Y >= 0) DrawCell(r, value, game.PieceX + c.X, game.PieceY + c.Y, cellTint);
+            }
             int next = PSPTetrisBlocks.Material(game.NextMaterial);
             foreach (Point2 c in PSPTetrisGame.GetCells(game.NextShape, 0))
                 DrawAt(r, next, PreviewX + c.X * Cell, PreviewY + c.Y * Cell, tint, 1f);

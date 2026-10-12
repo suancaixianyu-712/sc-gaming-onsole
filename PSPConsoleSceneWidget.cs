@@ -100,9 +100,10 @@ namespace Game {
                 p.Rect(PSPTetrisBoardWidget.FieldX + x * c, PSPTetrisBoardWidget.FieldY, 1f, c * PSPTetrisGame.Rows, new Color(30, 40, 60));
             p.Rect(PSPTetrisBoardWidget.PreviewX - 12f, PSPTetrisBoardWidget.PreviewY - 32f, c * 4f + 24f, c * 4f + 44f, new Color(18, 29, 44, 220));
             p.Rect(PSPTetrisBoardWidget.PreviewX - 12f, PSPTetrisBoardWidget.PreviewY - 32f, c * 4f + 24f, 3f, new Color(141, 220, 247));
+            // 提示框仍叠在场地中央，不为此缩小场地。
             if (game.IsPaused || game.Phase == PSPGamePhase.Finished) {
-                p.Rect(238f, 225f, 484f, 130f, new Color(8, 15, 28, 240));
-                p.Rect(238f, 225f, 3f, 130f, new Color(141, 220, 247));
+                p.Rect(300f, 200f, 360f, 120f, new Color(8, 15, 28, 230));
+                p.Rect(300f, 200f, 3f, 120f, new Color(141, 220, 247));
             }
         }
 
