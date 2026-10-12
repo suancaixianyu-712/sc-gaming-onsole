@@ -215,7 +215,7 @@ namespace Game {
 
     /// <summary>白名单原版方块，固定 data，保证场地与预览朝向一致。</summary>
     public static class PSPTetrisBlocks {
-        public const int MaterialCount = 4;
+        public const int MaterialCount = 3;
         static int[] s_values;
         static int s_border;
 
@@ -223,7 +223,6 @@ namespace Game {
             if (s_values != null) return;
             s_values = [
                 Terrain.MakeBlockValue(BlocksManager.GetBlockIndex<GraniteBlock>(), 0, 0),
-                Terrain.MakeBlockValue(BlocksManager.GetBlockIndex<CraftingTableBlock>(), 0, 0),
                 Terrain.MakeBlockValue(BlocksManager.GetBlockIndex<FurnaceBlock>(), 0, 0),
                 Terrain.MakeBlockValue(BlocksManager.GetBlockIndex<OakWoodBlock>(), 0, 0)
             ];
